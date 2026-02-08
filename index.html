@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Only For You ❤️</title>
+
+<style>
+body{
+margin:0;
+background:black;
+color:white;
+font-family:Segoe UI;
+overflow:hidden;
+}
+section{display:none;min-height:100vh;padding:30px;text-align:center;}
+section.active{display:block;}
+
+button{
+padding:12px 25px;
+border:none;
+border-radius:25px;
+background:#ff1f6d;
+color:white;
+font-size:16px;
+cursor:pointer;
+margin-top:20px;
+}
+
+/* ⭐ tiny music button */
+.musicBtn{
+position:fixed;
+bottom:10px;
+right:10px;
+font-size:18px;
+background:rgba(255,31,109,0.8);
+border-radius:50%;
+width:35px;
+height:35px;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+z-index:50;
+}
+
+/* floating hearts */
+.heart{
+position:fixed;
+bottom:-20px;
+font-size:22px;
+color:#ff1f6d;
+animation:float 6s linear forwards;
+z-index:-1;
+}
+@keyframes float{to{transform:translateY(-110vh);opacity:0}}
+
+/* floating text */
+.floatText{
+position:fixed;
+color:pink;
+opacity:0.7;
+animation:fade 5s forwards;
+z-index:-1;
+}
+@keyframes fade{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+
+/* letters */
+.letters{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+max-width:420px;
+margin:auto;
+}
+.letter{background:#111;padding:20px;border-radius:15px;cursor:pointer}
+
+/* popup */
+.popup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+.popupBox{
+background:#111;
+padding:20px;
+border-radius:20px;
+max-width:300px;
+animation:pop 0.4s ease;
+}
+.popup img{width:100%;border-radius:15px;margin-top:10px}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+
+/* memory */
+.memory-grid{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px;
+max-width:420px;
+margin:auto;
+}
+.card{
+height:70px;
+background:linear-gradient(145deg,#3b0d22,#5a1534);
+border-radius:12px;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+overflow:hidden;
+border:1px solid #ff4f8b80;
+box-shadow:0 0 8px #ff1f6d40;
+transition:0.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+box-shadow:0 0 12px #ff1f6d80;
+}
+.card img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* wheel */
+#wheelContainer{width:260px;margin:auto;position:relative;}
+#wheel{
+width:260px;height:260px;border-radius:50%;
+background:conic-gradient(#ff1f6d 0 72deg,#ff4f8b 72deg 144deg,#ff1f6d 144deg 216deg,#ff4f8b 216deg 288deg,#ff1f6d 288deg 360deg);
+transition:transform 4s ease;
+position:relative;
+}
+#wheel span{
+position:absolute;
+left:50%;
+top:50%;
+transform-origin:0 0;
+font-size:13px;
+}
+.arrow{font-size:28px}
+
+/* puzzle */
+.preview{width:120px;margin:auto;margin-top:10px}
+.preview img{width:100%;border-radius:10px}
+
+#puzzleBoard{
+display:grid;
+grid-template-columns:repeat(3,100px);
+justify-content:center;
+margin-top:20px;
+}
+.piece{
+width:100px;height:100px;
+background-image:url("photo1.jpg");
+background-size:300px 300px;
+border:1px solid white;
+cursor:grab;
+}
+
+/* options */
+.option{
+background:#111;
+margin:10px;
+padding:12px;
+border-radius:15px;
+cursor:pointer;
+}
+.option:hover{background:#ff1f6d}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+<source src="my.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ⭐ Tiny music button -->
+<div class="musicBtn" onclick="startMusic()">🎵</div>
+
+<section id="s1" class="active">
+<h1>I Love You ❤️</h1>
+<button onclick="startMusic();next()">Let's start</button>
+</section>
+
+<section id="s2">
+<h2>My Letters 💌</h2>
+<div class="letters">
+<div class="letter" onclick="showLetter(1)">Letter 1</div>
+<div class="letter" onclick="showLetter(2)">Letter 2</div>
+<div class="letter" onclick="showLetter(3)">Letter 3</div>
+<div class="letter" onclick="showLetter(4)">Letter 4</div>
+<div class="letter" onclick="showLetter(5)">Letter 5</div>
+<div class="letter" onclick="showLetter(6)">Letter 6</div>
+<div class="letter" onclick="showLetter(7)">Letter 7</div>
+</div>
+</section>
+
+<section id="s3">
+<h2>Memory Match 💖</h2>
+<div class="memory-grid" id="memory"></div>
+<div id="memoryNext" style="display:none">
+<p>You found our memory ❤️</p>
+<button onclick="next()">Continue</button>
+</div>
+</section>
+
+<section id="s4">
+<h2>When We will Meet 💞</h2>
+<div class="arrow">⬇️</div>
+<div id="wheelContainer">
+<div id="wheel">
+<span style="transform:rotate(36deg) translate(80px)">I will Hug you🫂</span>
+<span style="transform:rotate(108deg) translate(80px)">I will Kiss you😘</span>
+<span style="transform:rotate(180deg) translate(80px)">I will Adore you🥰</span>
+<span style="transform:rotate(252deg) translate(80px)">I will do All the Things❤️</span>
+<span style="transform:rotate(324deg) translate(80px)">I will Click Photos of you📷</span>
+</div>
+</div>
+<button onclick="spinWheel()">Spin</button>
+<div id="wheelNext" style="display:none">
+<button onclick="next()">Continue ❤️</button>
+</div>
+</section>
+
+<section id="s5">
+<h2>Complete Picture 🧩</h2>
+<div class="preview">
+<img src="photo1.jpg">
+</div>
+<div id="puzzleBoard"></div>
+
+<div id="puzzleMessage" style="display:none; margin-top:20px;">
+<p style="font-size:20px; color:pink;">
+Just like this Puzzle You complete me ❤️
+</p>
+
+<button onclick="next()">Continue ❤️</button>
+</div>
+</section>
+
+<section id="s6">
+<h2>Will You Be My Valentine ❤️</h2>
+<div class="option" onclick="showFinal()">એક હોઈ હા</div>
+<div class="option" onclick="showFinal()">એક હોઈ એકદમ હા</div>
+<div class="option" onclick="showFinal()">એક હોઈ અરે હા ભાઈ હા</div>
+<div class="option" onclick="showFinal()">હું તો હંમેશા તારો જ છું ❤️</div>
+</section>
+
+<script>
+
+/* ⭐ MUSIC FIX */
+let musicStarted=false;
+
+function startMusic(){
+let music=document.getElementById("bgMusic");
+
+if(musicStarted){
+if(music.paused) music.play();
+return;
+}
+
+music.volume=0.9;
+
+music.play().then(()=>{
+musicStarted=true;
+}).catch(()=>{
+setTimeout(()=>music.play().catch(()=>{}),500);
+});
+}
+
+let current=1;
+function next(){
+document.getElementById("s"+current).classList.remove("active");
+current++;
+document.getElementById("s"+current).classList.add("active");
+}
+
+/* hearts */
+setInterval(()=>{
+let h=document.createElement("div");
+h.className="heart";
+h.innerHTML="❤️";
+h.style.left=Math.random()*100+"vw";
+document.body.appendChild(h);
+setTimeout(()=>h.remove(),6000);
+},700);
+
+/* letters */
+const letterTexts=[
+"",
+"Happy Rose Day 🌹<br> ગુલાબ ની જેમ તને હંમેશા સાચવી ને રાખા અને ગુલાબ ની સુગંધ ની જેમ હંમેશા તારું જીવન મહેકતું રાખા ❤️",
+"Happy Propose Day 💞<br> તું મને કઈ પણ પૂછશે હું તો હા જ પાડીશ ❤️",
+"Happy Chocolate Day 🍫<br> kitkat ની જેમ હંમેશા તારી favourite બની ને રહીશ ❤️",
+"Happy Teddy Day 🧸<br> Teddy Bear ની જેમ હંમેશા તને સુકુન આપા ❤️",
+"Happy Promise Day 🤝<br> જીવન ની દરેક સ્થિતિ માં તારો સાથ આપવાની Promise આપુ છું ❤️",
+"Happy Hug Day 🫂<br> This is a big hug from me to you ❤️",
+"Happy Kiss Day 💋<br> Virtual kisses just for you 😘"
+];
+
+function showLetter(num){
+let pop=document.createElement("div");
+pop.className="popup";
+pop.innerHTML=`
+<div class="popupBox">
+${letterTexts[num]}
+<img src="letter${num}.jpg">
+<br>
+${num===7 ? `<button onclick="closePopup();next()">Continue</button>` :
+`<button onclick="closePopup()">Close</button>`}
+</div>`;
+document.body.appendChild(pop);
+}
+function closePopup(){document.querySelector(".popup").remove();}
+
+/* MEMORY */
+const memory=document.getElementById("memory");
+const memoryValues=["IMG1","IMG2","X","X","X","X","X","X","X","X","X","X","X","X","X"];
+memoryValues.sort(()=>Math.random()-0.5);
+
+let firstCard=null;
+let secondCard=null;
+let lock=false;
+
+memoryValues.forEach(type=>{
+let card=document.createElement("div");
+card.className="card";
+card.dataset.type=type;
+
+card.onclick=()=>{
+
+if(lock || card===firstCard) return;
+
+if(type==="IMG1") card.innerHTML='<img src="memory1.jpg">';
+else if(type==="IMG2") card.innerHTML='<img src="memory2.jpg">';
+else card.innerHTML="💖";
+
+if(!firstCard){ firstCard=card; return; }
+
+secondCard=card;
+lock=true;
+
+if(
+(firstCard.dataset.type==="IMG1" && secondCard.dataset.type==="IMG2") ||
+(firstCard.dataset.type==="IMG2" && secondCard.dataset.type==="IMG1")
+){
+navigator.vibrate(300);
+document.getElementById("memoryNext").style.display="block";
+resetMemory();
+}
+else{
+setTimeout(()=>{
+firstCard.innerHTML="";
+secondCard.innerHTML="";
+resetMemory();
+},800);
+}
+};
+
+memory.appendChild(card);
+});
+
+function resetMemory(){
+firstCard=null;
+secondCard=null;
+lock=false;
+}
+
+/* SPIN WHEEL */
+let spinning=false;
+function spinWheel(){
+
+if(spinning) return;
+spinning=true;
+
+const wheel=document.getElementById("wheel");
+
+let options=["Hug","Kiss","Adore","All Things","Photos"];
+let resultIndex=Math.floor(Math.random()*options.length);
+
+let deg=360*5 + (resultIndex*72) + 36;
+wheel.style.transform=`rotate(${deg}deg)`;
+
+setTimeout(()=>{
+spinning=false;
+
+let pop=document.createElement("div");
+pop.className="popup";
+pop.innerHTML=`
+<div class="popupBox">
+<h2>${options[resultIndex]} ❤️</h2>
+<p>This is what I will do when we meet 😘</p>
+<button onclick="closePopup()">Close</button>
+</div>`;
+document.body.appendChild(pop);
+
+document.getElementById("wheelNext").style.display="block";
+
+},4000);
+}
+
+/* puzzle */
+const board=document.getElementById("puzzleBoard");
+let pieces=[...Array(9).keys()];
+pieces.sort(()=>Math.random()-0.5);
+
+pieces.forEach((pos,i)=>{
+let piece=document.createElement("div");
+piece.className="piece";
+piece.draggable=true;
+
+piece.style.backgroundPosition=`${-(pos%3)*100}px ${-Math.floor(pos/3)*100}px`;
+
+piece.addEventListener("dragstart",e=>{
+e.dataTransfer.setData("text",i);
+});
+
+piece.addEventListener("dragover",e=>e.preventDefault());
+
+piece.addEventListener("drop",e=>{
+let from=e.dataTransfer.getData("text");
+swap(board.children[from],piece);
+checkPuzzle();
+});
+
+board.appendChild(piece);
+});
+
+function swap(a,b){
+let temp=a.style.backgroundPosition;
+a.style.backgroundPosition=b.style.backgroundPosition;
+b.style.backgroundPosition=temp;
+}
+
+function checkPuzzle(){
+let done=true;
+[...board.children].forEach((p,i)=>{
+let correct=`${-(i%3)*100}px ${-Math.floor(i/3)*100}px`;
+if(p.style.backgroundPosition!==correct) done=false;
+});
+
+if(done){
+navigator.vibrate(500);
+document.getElementById("puzzleMessage").style.display="block";
+}
+}
+
+function showFinal(){
+let pop=document.createElement("div");
+pop.className="popup";
+pop.innerHTML=`
+<div class="popupBox">
+<h2>Happy Valentine's Day Shubham (Jhingu) ❤️</h2>
+<p>This entire website was for only for you which is created by me ❤️
+I have put in so much efforts to make this dreamy and beautiful ❤️ and to make your day special ❤️ because you are soooo special to me ❤️
+It took almost 15 to 20 trials of websites, 15 to 20 trials of coding and 400 to 500 chats or even more with Chat GPT 😂 but this all is worth it just because of this smile on your face ❤️
+I love you sooo much Shubham ❤️ you mean soooo much to me which I can't define but I can tell you that in every Universe I only and only wants you as my Life Partner ❤️
+
+Even miles can't stop us from making new memories and loving each other ❤️ and even if you asks me or not my answer is always a</p>
+<h1 style="color:red;font-size:45px">YES</h1>
+<button onclick="location.reload()">Start Again ❤️</button>
+</div>`;
+document.body.appendChild(pop);
+}
+</script>
+</body>
+</html>
